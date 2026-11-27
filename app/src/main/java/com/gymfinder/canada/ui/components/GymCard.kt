@@ -37,6 +37,8 @@ import com.gymfinder.canada.ui.theme.CardBackground
 import com.gymfinder.canada.ui.theme.PrimaryOrange
 import com.gymfinder.canada.ui.theme.PrimaryText
 import com.gymfinder.canada.ui.theme.SecondaryText
+import com.gymfinder.canada.util.CurrencyFormatter
+import com.gymfinder.canada.util.ImageResolver
 
 @Composable
 fun GymCard(
@@ -60,7 +62,7 @@ fun GymCard(
                     .height(130.dp)
             ) {
                 Image(
-                    painter = painterResource(id = gym.imageResId),
+                    painter = painterResource(id = ImageResolver.getDrawableResId(gym.imageReference)),
                     contentDescription = gym.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -136,7 +138,7 @@ fun GymCard(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = "$${String.format("%.2f", gym.priceMonthly)}",
+                        text = CurrencyFormatter.formatMonthlyPrice(gym.monthlyPrice),
                         color = PrimaryOrange,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold

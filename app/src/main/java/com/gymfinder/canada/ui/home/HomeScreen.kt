@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gymfinder.canada.domain.model.City
 import com.gymfinder.canada.ui.components.CitySelector
 import com.gymfinder.canada.ui.components.GymCard
 import com.gymfinder.canada.ui.components.GymLogo
@@ -48,14 +50,22 @@ import com.gymfinder.canada.ui.theme.MainBackground
 import com.gymfinder.canada.ui.theme.PrimaryOrange
 import com.gymfinder.canada.ui.theme.PrimaryText
 import com.gymfinder.canada.ui.theme.SecondaryText
+import com.gymfinder.canada.util.CityDataProvider
 
 @Composable
 fun HomeScreen(
-    onNavigateToExplore: () -> Unit,
+    selectedCity: City,
+    onNavigateToExplore: (String?) -> Unit,
+    onCityClick: () -> Unit,
+    onGymClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(selectedCity) {
+        viewModel.updateSelectedCity(selectedCity)
+    }
 
     Column(
         modifier = modifier
@@ -119,7 +129,8 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             CitySelector(
-                cityName = uiState.selectedCity,
+                cityName = selectedCity.displayName,
+                onClick = onCityClick,
                 modifier = Modifier.weight(1f)
             )
             WeatherCard(
@@ -139,7 +150,7 @@ fun HomeScreen(
 
         // Promotional Banner
         PromoBanner(
-            onExploreClick = onNavigateToExplore
+            onExploreClick = { onNavigateToExplore(null) }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -148,7 +159,7 @@ fun HomeScreen(
         SectionHeading(
             title = "Featured gyms",
             actionText = "See all",
-            onActionClick = onNavigateToExplore
+            onActionClick = { onNavigateToExplore(null) }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -161,7 +172,7 @@ fun HomeScreen(
             items(uiState.featuredGyms, key = { it.id }) { gym ->
                 GymCard(
                     gym = gym,
-                    onClick = { /* Nav to Gym Details in Part 2 */ },
+                    onClick = { onGymClick(gym.id) },
                     onFavoriteClick = { /* Bookmark toggle in Part 3 */ }
                 )
             }
@@ -176,6 +187,11 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     com.gymfinder.canada.ui.theme.GymFinderTheme {
-        HomeScreen(onNavigateToExplore = {})
+        HomeScreen(
+            selectedCity = CityDataProvider.defaultCity,
+            onNavigateToExplore = {},
+            onCityClick = {},
+            onGymClick = {}
+        )
     }
 }
